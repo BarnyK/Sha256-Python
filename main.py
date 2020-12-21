@@ -30,8 +30,10 @@ def encrypt(message: str):
     return message
 
 def encrypt_bytes(message: bytes):
-    return 0
+    return NotImplementedError
 
+def encrypt_file(filename):
+    return NotImplementedError
 
 if __name__ == "__main__":
     while True:
