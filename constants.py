@@ -1,4 +1,4 @@
-HASH_VALUES = [
+INITIAL_HASH_VALUES = [
     0x6a09e667,
     0xbb67ae85,
     0x3c6ef372,
