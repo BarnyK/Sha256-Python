@@ -1,4 +1,4 @@
-from sys import argv
+import argparse
 from constants import INITIAL_HASH_VALUES, CONSTANTS
 
 # Words = 32b
@@ -66,9 +66,17 @@ def sha256_from_file(filename):
 
 
 if __name__ == "__main__":
-    while True:
-        if len(argv) == 1:
-            message = input("Input data: ")
+    parser = argparse.ArgumentParser(description="SHA256 hashing")
+    parser.add_argument("--file", "-f" , nargs="?", action="store")
+    parser.add_argument("text", nargs="?", help="Text to be hashed")
+    arguments = parser.parse_args()
+    if arguments.file:
+        try:
+            sha256_from_file(arguments.file)
+        except FileNotFoundError:
+            print(f"File {arguments.file} not found")
+    else:
+        if arguments.text:
+            print(sha256(arguments.text))
         else:
-            message = argv[1]
-        print(sha256(message))
+            print("No arguments supplied (--help for help)")
