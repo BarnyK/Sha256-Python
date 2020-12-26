@@ -11,10 +11,14 @@ class Test_Hashing(unittest.TestCase):
         from hashlib import sha256
 
         message = "mzxkjcvnjkznxjkgvneqwiufhqwpqmajsdklfmaklsdmflkmklni2h543245njk"
-        hash_test = self.hash(message)
-        hash_known = sha256(message)
+        hash_test = self.hash(message,"utf-8").hex()
+        hash_known = sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
+    def test_result_empty(self):
+        from hashlib import sha256
 
+        hash_test = self.hash("").hex()
+        self.assertEqual("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", hash_test)
 
 class Test_Padding(unittest.TestCase):
     def setUp(self):
@@ -25,7 +29,7 @@ class Test_Padding(unittest.TestCase):
     def test_padding(self):
         message = bytearray("abcd","utf-8")
         padded_message = self.pad_message(message)
-        message += b"\x80" + b"\x00" * 58 + b"\x04"
+        message += b"\x80" + b"\x00" * 58 + b"\x20"
         self.assertEqual(padded_message, message)
 
     def test_padding_for_empty(self):
@@ -37,9 +41,7 @@ class Test_Padding(unittest.TestCase):
     def test_padding_for_big(self):
         message = bytearray("a" * 534,"utf-8")
         padded_message = self.pad_message(message)
-        message += b"\x80" + b"\x00" * 33 + b"\x00\x00\x00\x00\x00\x00\x02\x16"
-        print(len(message))
-        print(len(padded_message))
+        message += b"\x80" + b"\x00" * 33 + b"\x00\x00\x00\x00\x00\x00\x10\xb0"
         self.assertEqual(padded_message, message)
 
     def test_padding_for_length(self):
@@ -60,15 +62,15 @@ class Test_Message_Division(unittest.TestCase):
         self.assertRaises(Exception, self.divide, message)
 
     def test_correct_number(self):
-        message = b"a" * 64 * 5
+        message = b"a" * 16 * 5
         messages = self.divide(message)
         self.assertEqual(len(messages), 5)
 
     def test_correct_lengths(self):
-        message = b"a" * 64 * 5
+        message = b"a" * 64  * 5
         messages = self.divide(message)
         for m in messages:
-            self.assertEquals(len(m), 64)
+            self.assertEquals(len(m), 16)
 
     def test_correct_result(self):
         message = b"a" * 64 * 64

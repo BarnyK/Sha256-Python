@@ -1,4 +1,4 @@
-INITIAL_HASH_VALUES = [
+INITIAL_HASH_VALUES = (
     0x6a09e667,
     0xbb67ae85,
     0x3c6ef372,
@@ -7,8 +7,8 @@ INITIAL_HASH_VALUES = [
     0x9b05688c,
     0x1f83d9ab,
     0x5be0cd19
-]
-CONSTANTS = [
+)
+CONSTANTS = (
         0x428A2F98,
         0x71374491,
         0xB5C0FBCF,
@@ -73,4 +73,4 @@ CONSTANTS = [
         0xA4506CEB,
         0xBEF9A3F7,
         0xC67178F2,
-    ]
+)
