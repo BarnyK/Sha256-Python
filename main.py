@@ -95,9 +95,9 @@ def sha256_bytes(message: bytearray):
     def _extend_chunk(W: list, i: int):
         return (W[i - 16] + s0(W[i - 15]) + W[i - 7] + s1(W[i - 2])) & 0xFFFFFFFF
 
-    def _round(hash_values: tuple, w: int, c: int):
+    def _round(hash_values: tuple, w: int, constant: int):
         a, b, c, d, e, f, g, h = hash_values
-        T1 = h + S1(e) + Ch(e, f, g) + c + w 
+        T1 = h + S1(e) + Ch(e, f, g) + constant + w 
         T2 = S0(a) + Maj(a, b, c)
         return (
             (T1 + T2) & 0xFFFFFFFF,
