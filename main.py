@@ -1,26 +1,6 @@
 import argparse
 from constants import INITIAL_HASH_VALUES, CONSTANTS
-
-# Words = 32b = 4B = Unsigned Integer
-# Chunk = 512b = 64B
-#
-def circular_shift(x: int, y: int):
-    """
-    Word circular shift of Word x by amount y
-    Word = 4B = integer
-    """
-    return (((x & 0xFFFFFFFF) >> (y & 31)) | (x << (32 - (y & 31)))) & 0xFFFFFFFF
-
-
-def copy_into_list(list1: list, list2: list, index: int):
-    """
-    Copies list2 into list1 starting from position of index
-    """
-    if len(list2) + index > len(list1):
-        raise Exception("List length or index position mismatch")
-    for i in range(len(list2)):
-        list1[index + i] = list2[i]
-    return list1
+from helpers import bytes_to_words, word_list_to_bytes, circular_shift
 
 
 def pad_message(byte_message: bytearray):
@@ -30,36 +10,13 @@ def pad_message(byte_message: bytearray):
     Number of zeroes is chosen so that the final message is divisible by 512 in bits
     """
     message_copy = byte_message[:]  # Copy because bytearrays are passed by reference
-    number_of_zeros = 64 - ((len(message_copy) + 8) & 0x3f)
+    number_of_zeros = 64 - ((len(message_copy) + 8) & 0x3F)
     message_copy += (
         b"\x80"
         + bytearray(number_of_zeros - 1)
-        + (len(message_copy)*8).to_bytes(8, "big")
+        + (len(message_copy) * 8).to_bytes(8, "big")
     )
     return message_copy
-
-
-def bytes_to_words(byte_message: bytearray):
-    """
-    Transforms bytearray into list of 32 bit unsigned integers
-    """
-    if len(byte_message) % 64 != 0:
-        raise Exception("Message length must be divisible by 64B")
-    result = [
-        int.from_bytes(byte_message[4 * i : 4 * (i + 1)], "big")
-        for i in range(int(len(byte_message) / 4))
-    ]
-    return result
-
-
-def word_list_to_bytes(words: list):
-    """
-    Transforms list of words into one bytearray
-    """
-    result = bytes()
-    for word in words:
-        result += word.to_bytes(4, "big")
-    return result
 
 
 def divide_message(word_list: list):
@@ -84,9 +41,9 @@ def sha256_bytes(message: bytearray):
     SHA256 hashing for bytearray
     """
     rr = lambda x, y: circular_shift(x, y)  # Right Rotate
-    rs = lambda x, y: (x & 0xFFFFFFFF) >> y
-    s0 = lambda x: rr(x, 7) ^ rr(x, 18) ^ rs(x,3)
-    s1 = lambda x: rr(x, 17) ^ rr(x, 19) ^ rs(x,10)
+    rs = lambda x, y: (x & 0xFFFFFFFF) >> y # Right Shift
+    s0 = lambda x: rr(x, 7) ^ rr(x, 18) ^ rs(x, 3)
+    s1 = lambda x: rr(x, 17) ^ rr(x, 19) ^ rs(x, 10)
     S1 = lambda x: rr(x, 6) ^ rr(x, 11) ^ rr(x, 25)
     S0 = lambda x: rr(x, 2) ^ rr(x, 13) ^ rr(x, 22)
     Ch = lambda x, y, z: z ^ (x & (y ^ z))
@@ -97,7 +54,7 @@ def sha256_bytes(message: bytearray):
 
     def _round(hash_values: tuple, w: int, constant: int):
         a, b, c, d, e, f, g, h = hash_values
-        T1 = h + S1(e) + Ch(e, f, g) + constant + w 
+        T1 = h + S1(e) + Ch(e, f, g) + constant + w
         T2 = S0(a) + Maj(a, b, c)
         return (
             (T1 + T2) & 0xFFFFFFFF,
