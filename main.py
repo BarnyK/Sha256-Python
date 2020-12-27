@@ -1,6 +1,6 @@
 import argparse
 from constants import INITIAL_HASH_VALUES, CONSTANTS
-from helpers import bytes_to_words, word_list_to_bytes, circular_shift
+from helpers import bytes_to_words, words_to_bytes, circular_shift
 
 
 def pad_message(byte_message: bytearray):
@@ -42,7 +42,7 @@ def sha256_bytes(message: bytearray):
     """
     rr = lambda x, y: circular_shift(x, y)  # Right Rotate
     rs = lambda x, y: (x & 0xFFFFFFFF) >> y # Right Shift
-    s0 = lambda x: rr(x, 7) ^ rr(x, 18) ^ rs(x, 3)
+    s0 = lambda x: rr(x, 7) ^ rr(x, 18) ^ rs(x, 3)      
     s1 = lambda x: rr(x, 17) ^ rr(x, 19) ^ rs(x, 10)
     S1 = lambda x: rr(x, 6) ^ rr(x, 11) ^ rr(x, 25)
     S0 = lambda x: rr(x, 2) ^ rr(x, 13) ^ rr(x, 22)
@@ -85,7 +85,7 @@ def sha256_bytes(message: bytearray):
             new_hash_values = _round(new_hash_values, W[i], CONSTANTS[i])
 
         hash_values = _hash_addition(hash_values, new_hash_values)
-    return word_list_to_bytes(hash_values)
+    return words_to_bytes(hash_values)
 
 
 def sha256_from_file(filename):

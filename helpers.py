@@ -1,17 +1,17 @@
-def bytes_to_words(byte_message: bytearray):
+def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list:
     """
-    Transforms bytearray into list of 32 bit unsigned integers
+    Transforms bytes into list of 
     """
-    if len(byte_message) % 64 != 0:
-        raise Exception("Message length must be divisible by 64B")
+    if len(byte_message) % word_size != 0:
+        raise Exception("byte_message length should be divisible by word_size")
     result = [
-        int.from_bytes(byte_message[4 * i : 4 * (i + 1)], "big")
-        for i in range(int(len(byte_message) / 4))
+        int.from_bytes(byte_message[word_size * i : word_size * (i + 1)], "big")
+        for i in range(len(byte_message) // word_size)
     ]
     return result
 
 
-def word_list_to_bytes(words: list):
+def words_to_bytes(words: list):
     """
     Transforms list of words into one bytearray
     """
@@ -23,7 +23,7 @@ def word_list_to_bytes(words: list):
 
 def circular_shift(x: int, y: int):
     """
-    Word circular shift of Word x by amount y
-    Word = 4B = integer
+    4B circular shift of Word x by amount y
     """
     return (((x & 0xFFFFFFFF) >> (y & 31)) | (x << (32 - (y & 31)))) & 0xFFFFFFFF
+
