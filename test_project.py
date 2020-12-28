@@ -35,20 +35,17 @@ class Test_Hashing(unittest.TestCase):
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             hash_test,
         )
-    
+
     def test_file_hashing(self):
         from os import remove
+
         message = b"abcd"
         with open("test_file.tmp", "wb") as f:
             f.write(message)
         hash_known = self.lib_sha256(message).digest()
         hash_file = self.hash_file("test_file.tmp")
-        self.assertEqual(
-            hash_known,
-            hash_file
-        )
+        self.assertEqual(hash_known, hash_file)
         remove("test_file.tmp")
-
 
 
 class Test_Padding(unittest.TestCase):
@@ -133,3 +130,7 @@ class Test_Helpers(unittest.TestCase):
         from helpers import circular_shift
 
         self.assertEqual(circular_shift(circular_shift(23, 4), -4), 23)
+
+
+if __name__ == "__main__":
+    unittest.main()
