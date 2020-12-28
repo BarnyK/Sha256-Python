@@ -3,11 +3,12 @@ import unittest
 
 class Test_Hashing(unittest.TestCase):
     def setUp(self):
-        from main import sha256, sha256_bytes
+        from main import sha256, sha256_bytes, sha256_from_file
         from hashlib import sha256 as hashlib_sha256
 
         self.hash = sha256
         self.hash_bytes = sha256_bytes
+        self.hash_file = sha256_from_file
         self.lib_sha256 = hashlib_sha256
 
     def test_result_against_hashlib(self):
@@ -34,6 +35,20 @@ class Test_Hashing(unittest.TestCase):
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             hash_test,
         )
+    
+    def test_file_hashing(self):
+        from os import remove
+        message = b"abcd"
+        with open("test_file.tmp", "wb") as f:
+            f.write(message)
+        hash_known = self.lib_sha256(message).digest()
+        hash_file = self.hash_file("test_file.tmp")
+        self.assertEqual(
+            hash_known,
+            hash_file
+        )
+        remove("test_file.tmp")
+
 
 
 class Test_Padding(unittest.TestCase):
@@ -85,13 +100,13 @@ class Test_Message_Division(unittest.TestCase):
         message = b"a" * 64 * 5
         messages = self.divide(message)
         for m in messages:
-            self.assertEquals(len(m), 16)
+            self.assertEqual(len(m), 16)
 
     def test_correct_result(self):
         message = b"a" * 64 * 64
         messages = self.divide(message)
         res_message = b"".join(messages)
-        self.assertEquals(res_message, message)
+        self.assertEqual(res_message, message)
 
 
 class Test_Helpers(unittest.TestCase):
