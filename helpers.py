@@ -1,6 +1,6 @@
-def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list:
+def bytes_to_words(byte_message: bytes, word_size: int = 4):
     """
-    Transforms bytes into list of 
+    Transforms bytes into list of integer words
     """
     if len(byte_message) % word_size != 0:
         raise Exception("byte_message length should be divisible by word_size")
@@ -13,7 +13,7 @@ def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list:
 
 def words_to_bytes(words: list):
     """
-    Transforms list of words into one bytearray
+    Transforms list of words into one bytes object
     """
     result = bytes()
     for word in words:
@@ -23,7 +23,7 @@ def words_to_bytes(words: list):
 
 def circular_shift(x: int, y: int):
     """
-    4B circular shift of Word x by amount y
+    4 Byte circular shift of Word x by amount y
     """
     return (((x & 0xFFFFFFFF) >> (y & 31)) | (x << (32 - (y & 31)))) & 0xFFFFFFFF
 

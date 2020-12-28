@@ -3,7 +3,7 @@ import unittest
 
 class Test_Hashing(unittest.TestCase):
     def setUp(self):
-        from main import sha256, sha256_bytes, sha256_from_file
+        from sha256 import sha256, sha256_bytes, sha256_from_file
         from hashlib import sha256 as hashlib_sha256
 
         self.hash = sha256
@@ -65,7 +65,7 @@ class Test_Hashing(unittest.TestCase):
 
 class Test_Padding(unittest.TestCase):
     def setUp(self):
-        from main import pad_message
+        from sha256 import pad_message
 
         self.pad_message = pad_message
 

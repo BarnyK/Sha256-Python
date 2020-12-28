@@ -64,7 +64,7 @@ def sha256_bytes(message: bytes, in_hex=True):
             f,
             g,
         )
-    
+
     # initializing hash value and pre-processing
     hash_values = INITIAL_HASH_VALUES
     message = pad_message(message)
@@ -74,7 +74,7 @@ def sha256_bytes(message: bytes, in_hex=True):
     chunks = [word_list[16 * i : 16 * (i + 1)] for i in range(int(len(word_list) / 16))]
     for chunk in chunks:
         W = chunk[:]
-        
+
         # Extend chunks onto the whole range
         for i in range(16, 64):
             W.append(
@@ -95,7 +95,6 @@ def sha256_bytes(message: bytes, in_hex=True):
         return result.hex()
     else:
         return result
-
 
 
 def sha256_from_file(filename):
