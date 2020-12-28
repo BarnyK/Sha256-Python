@@ -12,7 +12,22 @@ class Test_Hashing(unittest.TestCase):
         self.lib_sha256 = hashlib_sha256
 
     def test_result_against_hashlib(self):
-        message = "bdfgbdfg"
+        message = "abcd"
+        hash_test = self.hash(message, "utf-8")
+        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        self.assertEqual(hash_test, hash_known)
+
+        message = "łźśąęąęóajiojsdiaofjdoikasg"
+        hash_test = self.hash(message, "utf-8")
+        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        self.assertEqual(hash_test, hash_known)
+
+        message = "r9VrOyhZDCzZ2iYMXhwl"
+        hash_test = self.hash(message, "utf-8")
+        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        self.assertEqual(hash_test, hash_known)
+
+        message = "OMqzk0wbdU4JeleDey8f"
         hash_test = self.hash(message, "utf-8")
         hash_known = self.lib_sha256(message.encode("utf-8")).digest()
         self.assertEqual(hash_test, hash_known)
