@@ -9,10 +9,10 @@ from test_project import make_test_suite
 def pad_message(byte_message: bytes):
     """
     Pads message to length divisible by 512b/64B
-    Appends binary 1 to the message and then appends number of zeros
+    Appends binary '1' to the message and then appends number of zeros
     Instead of binary operation it appends byte with '1' in most significant bit
     and then 0 value bytes
-    At the end we have 64b/8B reserved for length(in bits) of original message
+    At the end of the message adds 64b/8B containing length(in bits) of original message
     """
     number_of_zeros = 64 - ((len(byte_message) + 8) & 0x3F) - 1
     byte_message += (
