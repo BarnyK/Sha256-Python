@@ -14,38 +14,38 @@ class Test_Hashing(unittest.TestCase):
     def test_result_against_hashlib(self):
         message = "abcd"
         hash_test = self.hash(message, "utf-8")
-        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        hash_known = self.lib_sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
         message = "łźśąęąęóajiojsdiaofjdoikasg"
         hash_test = self.hash(message, "utf-8")
-        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        hash_known = self.lib_sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
         message = "r9VrOyhZDCzZ2iYMXhwl"
         hash_test = self.hash(message, "utf-8")
-        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        hash_known = self.lib_sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
         message = "OMqzk0wbdU4JeleDey8f"
         hash_test = self.hash(message, "utf-8")
-        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        hash_known = self.lib_sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
     def test_very_long(self):
         message = "abc" * 10000
         hash_test = self.hash(message, "utf-8")
-        hash_known = self.lib_sha256(message.encode("utf-8")).digest()
+        hash_known = self.lib_sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
     def test_very_big(self):
         message = b"\xFF" * 300
         hash_test = self.hash_bytes(message)
-        hash_known = self.lib_sha256(message).digest()
+        hash_known = self.lib_sha256(message).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
     def test_result_empty(self):
-        hash_test = self.hash("").hex()
+        hash_test = self.hash("")
         self.assertEqual(
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             hash_test,
@@ -57,7 +57,7 @@ class Test_Hashing(unittest.TestCase):
         message = b"abcd"
         with open("test_file.tmp", "wb") as f:
             f.write(message)
-        hash_known = self.lib_sha256(message).digest()
+        hash_known = self.lib_sha256(message).hexdigest()
         hash_file = self.hash_file("test_file.tmp")
         self.assertEqual(hash_known, hash_file)
         remove("test_file.tmp")
@@ -93,34 +93,6 @@ class Test_Padding(unittest.TestCase):
         self.assertEqual(len(padded_message), 576)
 
 
-class Test_Message_Division(unittest.TestCase):
-    def setUp(self):
-        from main import divide_message
-
-        self.divide = divide_message
-
-    def test_exception(self):
-        message = b"a" * 63
-        self.assertRaises(Exception, self.divide, message)
-
-    def test_correct_number(self):
-        message = b"a" * 16 * 5
-        messages = self.divide(message)
-        self.assertEqual(len(messages), 5)
-
-    def test_correct_lengths(self):
-        message = b"a" * 64 * 5
-        messages = self.divide(message)
-        for m in messages:
-            self.assertEqual(len(m), 16)
-
-    def test_correct_result(self):
-        message = b"a" * 64 * 64
-        messages = self.divide(message)
-        res_message = b"".join(messages)
-        self.assertEqual(res_message, message)
-
-
 class Test_Helpers(unittest.TestCase):
     def test_bytes_to_words_values(self):
         from helpers import bytes_to_words
@@ -145,6 +117,12 @@ class Test_Helpers(unittest.TestCase):
         from helpers import circular_shift
 
         self.assertEqual(circular_shift(circular_shift(23, 4), -4), 23)
+
+
+def make_test_suite():
+    loader = unittest.TestLoader()
+    suite = loader.discover("", pattern="test_*.py")
+    return suite
 
 
 if __name__ == "__main__":

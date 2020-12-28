@@ -1,54 +1,45 @@
 import argparse
+from unittest import TextTestRunner
 from sys import argv
 from constants import INITIAL_HASH_VALUES, CONSTANTS
 from helpers import bytes_to_words, words_to_bytes, circular_shift
+from test_project import make_test_suite
 
 
 def pad_message(byte_message: bytes):
     """
     Pads message to length divisible by 512b/64B
     Appends binary 1 to the message and then appends number of zeros
-    Number of zeroes is chosen so that the final message is divisible by 512 in bits
+    Instead of binary operation it appends byte with '1' in most significant bit
+    and then 0 value bytes
+    At the end we have 64b/8B reserved for length(in bits) of original message
     """
-    message_copy = byte_message[:]  # Copy because bytearrays are passed by reference
-    number_of_zeros = 64 - ((len(message_copy) + 8) & 0x3F)
-    message_copy += (
+    number_of_zeros = 64 - ((len(byte_message) + 8) & 0x3F) - 1
+    byte_message += (
         b"\x80"
-        + bytearray(number_of_zeros - 1)
-        + (len(message_copy) * 8).to_bytes(8, "big")
+        + b"\x00" * (number_of_zeros)
+        + (len(byte_message) * 8).to_bytes(8, "big")
     )
-    return message_copy
+    return byte_message
 
 
-def divide_message(word_list: list):
-    """
-    Takes in list of words
-    Divides messages into chunks of size 16W/64B/512b
-    """
-    L = len(word_list)
-    if L % 16 != 0:
-        raise Exception("Word list length should be divisible by 16")
-    result_messages = [word_list[16 * i : 16 * (i + 1)] for i in range(int(L / 16))]
-    return result_messages
-
-
-def sha256(message: str, encoding: str = "utf-8"):
+def sha256(message: str, in_hex: bool = True, encoding: str = "utf-8"):
     message = bytearray(message, encoding)
-    return sha256_bytes(message)
+    return sha256_bytes(message, in_hex=in_hex)
 
 
-def sha256_bytes(message: bytes):
+def sha256_bytes(message: bytes, in_hex=True):
     """
     SHA256 hashing for bytearray
     """
-    rotr = lambda x, y: circular_shift(x, y)                # Right Rotate
-    rs = lambda x, y: (x & 0xFFFFFFFF) >> y                 # Right Shift
-    sum0 = lambda x: rotr(x, 7) ^ rotr(x, 18) ^ rs(x, 3)      # Sum 0 function
-    sum1 = lambda x: rotr(x, 17) ^ rotr(x, 19) ^ rs(x, 10)    # Sum 1 function
-    sigma0 = lambda x: rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22)   # Sigma0 function
-    sigma1 = lambda x: rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25)   # Sigma1 function
-    Ch = lambda x, y, z: z ^ (x & (y ^ z))                  # Choose function
-    Maj = lambda x, y, z: ((x | y) & z) | (x & y)           # Majority function
+    rotr = lambda x, y: circular_shift(x, y)  # Right Rotate
+    rs = lambda x, y: (x & 0xFFFFFFFF) >> y  # Right Shift
+    sum0 = lambda x: rotr(x, 7) ^ rotr(x, 18) ^ rs(x, 3)  # Sum 0 function
+    sum1 = lambda x: rotr(x, 17) ^ rotr(x, 19) ^ rs(x, 10)  # Sum 1 function
+    sigma0 = lambda x: rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22)  # Sigma0 function
+    sigma1 = lambda x: rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25)  # Sigma1 function
+    Ch = lambda x, y, z: z ^ (x & (y ^ z))  # Choose function
+    Maj = lambda x, y, z: ((x | y) & z) | (x & y)  # Majority function
 
     def _round(hash_values: tuple, w: int, constant: int):
         # Function performing one round of the compression function
@@ -67,34 +58,39 @@ def sha256_bytes(message: bytes):
         )
 
     message = pad_message(message)
-    words_list = bytes_to_words(message)
-    chunks = divide_message(words_list)
+    word_list = bytes_to_words(message)
+    chunks = [word_list[16 * i : 16 * (i + 1)] for i in range(int(len(word_list) / 16))]
     hash_values = INITIAL_HASH_VALUES
     for chunk in chunks:
         W = chunk[:]
+        
         # Extend chunks onto the whole range
         for i in range(16, 64):
-            W.append((W[i - 16] + sum0(W[i - 15]) + W[i - 7] + sum1(W[i - 2])) & 0xFFFFFFFF)
+            W.append(
+                (W[i - 16] + sum0(W[i - 15]) + W[i - 7] + sum1(W[i - 2])) & 0xFFFFFFFF
+            )
 
-        new_hash_values = hash_values
+        current_hash_values = hash_values
+
+        # Compression loop
         for i in range(64):
-            new_hash_values = _round(new_hash_values, W[i], CONSTANTS[i])
+            current_hash_values = _round(current_hash_values, W[i], CONSTANTS[i])
 
-        hash_values = tuple([(new_hash_values[i] + hash_values[i]) & 0xFFFFFFFF for i in range(8)])
-    return words_to_bytes(hash_values)
+        hash_values = tuple(
+            [(current_hash_values[i] + hash_values[i]) & 0xFFFFFFFF for i in range(8)]
+        )
+    result = words_to_bytes(hash_values)
+    if in_hex:
+        return result.hex()
+    else:
+        return result
+
 
 
 def sha256_from_file(filename):
     with open(filename, "rb") as f:
         message = bytearray(f.read())
     return sha256_bytes(message)
-
-
-def make_test_suite():
-    loader = unittest.TestLoader()
-    suite = loader.discover("", pattern="test_*.py")
-
-    return suite
 
 
 if __name__ == "__main__":
@@ -106,26 +102,22 @@ if __name__ == "__main__":
         action="store",
         help="Allows to specify the file from which the data will be hashed",
     )
-    parser.add_argument("text", nargs="?", help="Text to be hashed")
+    parser.add_argument("text", nargs="?", const="", help="Text to be hashed")
     parser.add_argument(
         "--test", "-t", action="store_true", help="Runs tests for the program"
     )
     args = parser.parse_args()
     if args.test:
-        import unittest
-
-        runner = unittest.TextTestRunner(verbosity=2)
+        # Run unittest tests
+        runner = TextTestRunner(verbosity=2)
         runner.run(make_test_suite())
     elif args.file:
         try:
-            sha256_from_file(args.file)
+            print(sha256_from_file(args.file))
         except FileNotFoundError:
             print(f"File {args.file} not found")
     else:
-        if args.text:
-            print(sha256(args.text, "ascii").hex())
-            from hashlib import sha256 as sha2562
-
-            print(sha2562(args.text.encode("ascii")).hexdigest())
+        if args.text is not None:
+            print(sha256(args.text, "ascii"))
         else:
             print("No arguments supplied (--help for help)")
