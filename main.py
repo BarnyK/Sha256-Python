@@ -24,13 +24,21 @@ def pad_message(byte_message: bytes):
 
 
 def sha256(message: str, in_hex: bool = True, encoding: str = "utf-8"):
-    message = bytearray(message, encoding)
+    """
+    SHA256 hashing for string message
+    message - string message to be hashed
+    in_hex - controlls if output will be in hex(defualt) or in bytes
+    encoding - specifies encoding used for string to bytes conversion
+    """
+    message = message.encode(encoding)
     return sha256_bytes(message, in_hex=in_hex)
 
 
 def sha256_bytes(message: bytes, in_hex=True):
     """
-    SHA256 hashing for bytearray
+    SHA256 hashing for bytes
+    message - bytes to be hashed
+    in_hex - controlls if output will be in hex or in bytes(default)
     """
     rotr = lambda x, y: circular_shift(x, y)  # Right Rotate
     rs = lambda x, y: (x & 0xFFFFFFFF) >> y  # Right Shift
@@ -56,11 +64,14 @@ def sha256_bytes(message: bytes, in_hex=True):
             f,
             g,
         )
-
+    
+    # initializing hash value and pre-processing
+    hash_values = INITIAL_HASH_VALUES
     message = pad_message(message)
     word_list = bytes_to_words(message)
+
+    # Spltiting into 64B length chunks
     chunks = [word_list[16 * i : 16 * (i + 1)] for i in range(int(len(word_list) / 16))]
-    hash_values = INITIAL_HASH_VALUES
     for chunk in chunks:
         W = chunk[:]
         
@@ -88,6 +99,9 @@ def sha256_bytes(message: bytes, in_hex=True):
 
 
 def sha256_from_file(filename):
+    """
+    Read file bytes and hashes them
+    """
     with open(filename, "rb") as f:
         message = bytearray(f.read())
     return sha256_bytes(message)
