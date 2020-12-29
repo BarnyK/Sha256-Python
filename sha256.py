@@ -49,10 +49,10 @@ def sha256_bytes(message: bytes, in_hex=True):
     Ch = lambda x, y, z: z ^ (x & (y ^ z))  # Choose function
     Maj = lambda x, y, z: ((x | y) & z) | (x & y)  # Majority function
 
-    def _round(hash_values: tuple, w: int, constant: int):
+    def _round(hash_values: tuple, word: int, constant: int):
         # Function performing one round of the compression function
         a, b, c, d, e, f, g, h = hash_values
-        temp1 = h + sigma1(e) + Ch(e, f, g) + constant + w
+        temp1 = h + sigma1(e) + Ch(e, f, g) + constant + word
         temp2 = sigma0(a) + Maj(a, b, c)
         return (
             (temp1 + temp2) & 0xFFFFFFFF,
@@ -73,15 +73,15 @@ def sha256_bytes(message: bytes, in_hex=True):
     # Spltiting into 64B length chunks
     chunks = [word_list[16 * i : 16 * (i + 1)] for i in range(int(len(word_list) / 16))]
     for chunk in chunks:
+        # Initializing values for the current loop
         W = chunk[:]
+        current_hash_values = hash_values
 
         # Extend chunks onto the whole range
         for i in range(16, 64):
             W.append(
                 (W[i - 16] + sum0(W[i - 15]) + W[i - 7] + sum1(W[i - 2])) & 0xFFFFFFFF
             )
-
-        current_hash_values = hash_values
 
         # Compression loop
         for i in range(64):
