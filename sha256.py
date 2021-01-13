@@ -1,6 +1,7 @@
 import argparse
 from unittest import TextTestRunner
 from sys import argv
+
 from constants import INITIAL_HASH_VALUES, CONSTANTS
 from helpers import bytes_to_words, words_to_bytes, circular_shift
 from test_project import make_test_suite
@@ -14,7 +15,7 @@ def pad_message(byte_message: bytes):
     and then 0 value bytes
     At the end of the message adds 64b/8B containing length(in bits) of original message
     """
-    number_of_zeros = 64 - ((len(byte_message) + 8) & 0x3F) - 1
+    number_of_zeros = 64 - ((len(byte_message) + 8) % 64) - 1
     byte_message += (
         b"\x80"
         + b"\x00" * (number_of_zeros)
@@ -49,9 +50,9 @@ def sha256_bytes(message: bytes, in_hex=True):
     Ch = lambda x, y, z: z ^ (x & (y ^ z))  # Choose function
     Maj = lambda x, y, z: ((x | y) & z) | (x & y)  # Majority function
 
-    def _round(hash_values: tuple, word: int, constant: int):
+    def _round(working_variables: tuple, word: int, constant: int):
         # Function performing one round of the compression function
-        a, b, c, d, e, f, g, h = hash_values
+        a, b, c, d, e, f, g, h = working_variables
         temp1 = h + sigma1(e) + Ch(e, f, g) + constant + word
         temp2 = sigma0(a) + Maj(a, b, c)
         return (
@@ -75,20 +76,20 @@ def sha256_bytes(message: bytes, in_hex=True):
     for chunk in chunks:
         # Initializing values for the current loop
         W = chunk[:]
-        current_hash_values = hash_values
+        working_variables = hash_values
 
         # Extend chunks onto the whole range
         for i in range(16, 64):
             W.append(
                 (W[i - 16] + sum0(W[i - 15]) + W[i - 7] + sum1(W[i - 2])) & 0xFFFFFFFF
             )
-
+        
         # Compression loop
         for i in range(64):
-            current_hash_values = _round(current_hash_values, W[i], CONSTANTS[i])
+            working_variables = _round(working_variables, W[i], CONSTANTS[i])
 
         hash_values = tuple(
-            [(current_hash_values[i] + hash_values[i]) & 0xFFFFFFFF for i in range(8)]
+            [(working_variables[i] + hash_values[i]) & 0xFFFFFFFF for i in range(8)]
         )
     result = words_to_bytes(hash_values)
     if in_hex:
@@ -97,7 +98,7 @@ def sha256_bytes(message: bytes, in_hex=True):
         return result
 
 
-def sha256_from_file(filename):
+def sha256_from_file(filename: str):
     """
     Read file bytes and hashes them
     """
