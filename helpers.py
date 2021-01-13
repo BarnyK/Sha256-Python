@@ -11,13 +11,13 @@ def bytes_to_words(byte_message: bytes, word_size: int = 4):
     return result
 
 
-def words_to_bytes(words: list):
+def words_to_bytes(words: list, word_size: int = 4):
     """
     Transforms list of words into one bytes object
     """
     result = bytes()
     for word in words:
-        result += word.to_bytes(4, "big")
+        result += word.to_bytes(word_size, "big")
     return result
 
 
