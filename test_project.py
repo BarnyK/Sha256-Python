@@ -32,6 +32,12 @@ class Test_Hashing(unittest.TestCase):
         hash_known = self.lib_sha256(message.encode("utf-8")).hexdigest()
         self.assertEqual(hash_test, hash_known)
 
+    def test_bytes_hashing(self):
+        message = b"asdf"
+        hash_test = self.hash_bytes(message)
+        hash_known = self.lib_sha256(message).hexdigest()
+        self.assertEqual(hash_test, hash_known)
+
     def test_very_long(self):
         message = "abc" * 10000
         hash_test = self.hash(message, "utf-8")
@@ -45,10 +51,33 @@ class Test_Hashing(unittest.TestCase):
         self.assertEqual(hash_test, hash_known)
 
     def test_result_empty(self):
+        """
+        soruce: https://en.wikipedia.org/wiki/SHA-2
+        """
         hash_test = self.hash("")
         self.assertEqual(
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             hash_test,
+        )
+
+    def test_known_abc(self):
+        """
+        source: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf
+        """
+        hash_test = self.hash("abc")
+        self.assertEqual(
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+            hash_test
+        )
+    
+    def test_known_longer(self):
+        """
+        source: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf
+        """
+        hash_test = self.hash("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
+        self.assertEqual(
+            "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
+            hash_test
         )
 
     def test_file_hashing(self):
