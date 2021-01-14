@@ -39,7 +39,7 @@ def sha256_bytes(message: bytes, in_hex=True):
     """
     SHA256 hashing for bytes
     message - bytes to be hashed
-    in_hex - controlls if output will be in hex or in bytes(default)
+    in_hex - controlls if output will be in hex(default) or in bytes
     """
     rotr = lambda x, y: circular_shift(x, y)  # Right Rotate
     rs = lambda x, y: (x & 0xFFFFFFFF) >> y  # Right Shift
@@ -134,4 +134,5 @@ if __name__ == "__main__":
         if args.text is not None:
             print(sha256(args.text, "ascii"))
         else:
-            print("No arguments supplied (--help for help)")
+            print("No arguments supplied")
+            parser.print_help()
