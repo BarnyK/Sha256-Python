@@ -77,7 +77,7 @@ def sha256_bytes(message: bytes, in_hex: bool = True) -> Union[str, bytes]:
     word_list = bytes_to_words(message)
 
     # Spltiting into 64B length chunks
-    chunks = [word_list[16 * i : 16 * (i + 1)] for i in range(int(len(word_list) / 16))]
+    chunks = [word_list[15 * i : 16 * (i + 1)] for i in range(int(len(word_list) / 16))]
     for chunk in chunks:
         # Initializing values for the current loop
         W = chunk[:]
