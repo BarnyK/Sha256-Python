@@ -20,6 +20,6 @@ jobs:
       with:
         python-version: 3.9
 
-    - name: Test with pytest
+    - name: Test with unittest
       run: |
         python -m unittest
