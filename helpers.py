@@ -1,4 +1,4 @@
-def bytes_to_words(byte_message: bytes, word_size: int = 4):
+def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list[str]:
     """
     Transforms bytes into list of integer words
     """
@@ -11,7 +11,7 @@ def bytes_to_words(byte_message: bytes, word_size: int = 4):
     return result
 
 
-def words_to_bytes(words: list, word_size: int = 4):
+def words_to_bytes(words: list, word_size: int = 4) -> bytes:
     """
     Transforms list of words into one bytes object
     """
@@ -21,7 +21,7 @@ def words_to_bytes(words: list, word_size: int = 4):
     return result
 
 
-def circular_shift(x: int, y: int):
+def circular_shift(x: int, y: int) -> int:
     """
     4 Byte circular shift of Word x by amount y
     """
