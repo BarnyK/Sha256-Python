@@ -1,13 +1,14 @@
+#!/usr/bin/env python3
 import argparse
+from typing import Union
 from unittest import TextTestRunner
-from sys import argv
 
-from constants import INITIAL_HASH_VALUES, CONSTANTS
-from helpers import bytes_to_words, words_to_bytes, circular_shift
+from constants import CONSTANTS, INITIAL_HASH_VALUES
+from helpers import bytes_to_words, circular_shift, words_to_bytes
 from test_project import make_test_suite
 
 
-def pad_message(byte_message: bytes):
+def pad_message(byte_message: bytes) -> bytes:
     """
     Pads message to length divisible by 512b/64B
     Appends binary '1' to the message and then appends number of zeros
@@ -24,22 +25,24 @@ def pad_message(byte_message: bytes):
     return byte_message
 
 
-def sha256(message: str, in_hex: bool = True, encoding: str = "utf-8"):
+def sha256(
+    message: str, in_hex: bool = True, encoding: str = "utf-8"
+) -> Union[str, bytes]:
     """
     SHA256 hashing for string message
-    message - string message to be hashed
-    in_hex - controlls if output will be in hex(defualt) or in bytes
-    encoding - specifies encoding used for string to bytes conversion
+    message : string message to be hashed
+    in_hex : controlls if output will be in hex(defualt) or in bytes
+    encoding : specifies encoding used for string to bytes conversion
     """
     message = message.encode(encoding)
     return sha256_bytes(message, in_hex=in_hex)
 
 
-def sha256_bytes(message: bytes, in_hex=True):
+def sha256_bytes(message: bytes, in_hex: bool = True) -> Union[str, bytes]:
     """
     SHA256 hashing for bytes
-    message - bytes to be hashed
-    in_hex - controlls if output will be in hex(default) or in bytes
+    message : bytes to be hashed
+    in_hex : controlls if output will be in hex(default) or in bytes
     """
     rotr = lambda x, y: circular_shift(x, y)  # Right Rotate
     rs = lambda x, y: (x & 0xFFFFFFFF) >> y  # Right Shift
@@ -50,7 +53,9 @@ def sha256_bytes(message: bytes, in_hex=True):
     Ch = lambda x, y, z: z ^ (x & (y ^ z))  # Choose function
     Maj = lambda x, y, z: ((x | y) & z) | (x & y)  # Majority function
 
-    def _round(working_variables: tuple, word: int, constant: int):
+    def perform_one_round(
+        working_variables: tuple[int, ...], word: int, constant: int
+    ) -> tuple[int, ...]:
         # Function performing one round of the compression function
         a, b, c, d, e, f, g, h = working_variables
         temp1 = h + sigma1(e) + Ch(e, f, g) + constant + word
@@ -83,10 +88,10 @@ def sha256_bytes(message: bytes, in_hex=True):
             W.append(
                 (W[i - 16] + sum0(W[i - 15]) + W[i - 7] + sum1(W[i - 2])) & 0xFFFFFFFF
             )
-        
+
         # Compression loop
         for i in range(64):
-            working_variables = _round(working_variables, W[i], CONSTANTS[i])
+            working_variables = perform_one_round(working_variables, W[i], CONSTANTS[i])
 
         hash_values = tuple(
             [(working_variables[i] + hash_values[i]) & 0xFFFFFFFF for i in range(8)]
