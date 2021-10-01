@@ -148,11 +148,5 @@ class Test_Helpers(unittest.TestCase):
         self.assertEqual(circular_shift(circular_shift(23, 4), -4), 23)
 
 
-def make_test_suite():
-    loader = unittest.TestLoader()
-    suite = loader.discover("", pattern="test_*.py")
-    return suite
-
-
 if __name__ == "__main__":
     unittest.main()
