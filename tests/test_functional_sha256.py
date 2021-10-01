@@ -122,30 +122,7 @@ class Test_Padding(unittest.TestCase):
         self.assertEqual(len(padded_message), 576)
 
 
-class Test_Helpers(unittest.TestCase):
-    def test_bytes_to_words_values(self):
-        from helpers import bytes_to_words
 
-        byte_message = b"a" * 64
-        words = bytes_to_words(byte_message)
-        self.assertEqual(words, [1633771873] * 16)
-
-    def test_words_to_bytes(self):
-        from helpers import words_to_bytes
-
-        words = [1633771873, 1633771873, 1633771873]
-        byte_message = words_to_bytes(words)
-        self.assertEqual(b"aaaaaaaaaaaa", byte_message)
-
-    def test_circular_shift(self):
-        from helpers import circular_shift
-
-        self.assertEqual(circular_shift(16, 4), 1)
-
-    def test_circular_shift_two_way(self):
-        from helpers import circular_shift
-
-        self.assertEqual(circular_shift(circular_shift(23, 4), -4), 23)
 
 
 if __name__ == "__main__":
