@@ -51,9 +51,7 @@ class Test_Hashing(unittest.TestCase):
         self.assertEqual(hash_test, hash_known)
 
     def test_result_empty(self):
-        """
-        soruce: https://en.wikipedia.org/wiki/SHA-2
-        """
+        # source: https://en.wikipedia.org/wiki/SHA-2
         hash_test = self.hash("")
         self.assertEqual(
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -61,9 +59,7 @@ class Test_Hashing(unittest.TestCase):
         )
 
     def test_known_abc(self):
-        """
-        source: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf
-        """
+        # source: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf
         hash_test = self.hash("abc")
         self.assertEqual(
             "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
@@ -71,9 +67,7 @@ class Test_Hashing(unittest.TestCase):
         )
     
     def test_known_longer(self):
-        """
-        source: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf
-        """
+        # source: https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf
         hash_test = self.hash("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
         self.assertEqual(
             "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
