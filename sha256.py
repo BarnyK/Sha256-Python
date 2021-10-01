@@ -5,8 +5,7 @@ from unittest import TextTestRunner
 
 from constants import CONSTANTS, INITIAL_HASH_VALUES
 from helpers import bytes_to_words, circular_shift, words_to_bytes
-from test_project import make_test_suite
-
+from tests import make_test_suite
 
 def pad_message(byte_message: bytes) -> bytes:
     """
