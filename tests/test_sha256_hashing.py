@@ -77,4 +77,3 @@ class Test_Hashing(unittest.TestCase):
         hash_file = self.hash_file("test_file.tmp")
         self.assertEqual(hash_known, hash_file)
         remove("test_file.tmp")
-
