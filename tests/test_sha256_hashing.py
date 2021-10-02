@@ -107,7 +107,3 @@ class Test_Padding(unittest.TestCase):
         message = bytearray("a" * 534, "utf-8")
         padded_message = self.pad_message(message)
         self.assertEqual(len(padded_message), 576)
-
-
-if __name__ == "__main__":
-    unittest.main()
