@@ -1,6 +1,2 @@
 /.vscode
-/__pycache__
-speedtests.py
-speedtest_results.csv
-speedtest_results_b.csv
-Untitled.m
+__pycache__

@@ -26,4 +26,3 @@ def circular_shift(x: int, y: int) -> int:
     4 Byte circular shift of Word x by amount y
     """
     return (((x & 0xFFFFFFFF) >> (y & 31)) | (x << (32 - (y & 31)))) & 0xFFFFFFFF
-
