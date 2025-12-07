@@ -136,7 +136,7 @@ if __name__ == "__main__":
             print(f"File {args.file} not found")
     else:
         if args.text is not None:
-            print(sha256(args.text, "ascii"))
+            print(sha256(args.text, encoding="utf-8"))
         else:
             print("No arguments supplied")
             parser.print_help()
