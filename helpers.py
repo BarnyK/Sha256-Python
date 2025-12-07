@@ -1,4 +1,4 @@
-def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list[str]:
+def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list[int]:
     """
     Transforms bytes into list of integer words
     """
@@ -15,10 +15,7 @@ def words_to_bytes(words: list, word_size: int = 4) -> bytes:
     """
     Transforms list of words into one bytes object
     """
-    result = bytes()
-    for word in words:
-        result += word.to_bytes(word_size, "big")
-    return result
+    return b"".join(word.to_bytes(word_size, "big") for word in words)
 
 
 def circular_shift(x: int, y: int) -> int:
