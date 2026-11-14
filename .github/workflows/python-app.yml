@@ -23,3 +23,8 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest discover -v tests "test_*.py"
+
+    - name: Typehint checking
+      run: |
+        pip install mypy
+        mypy sha256.py helpers.py constants.py

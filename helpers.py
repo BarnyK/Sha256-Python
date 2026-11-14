@@ -1,3 +1,6 @@
+from typing import Sequence
+
+
 def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list[int]:
     """
     Transforms bytes into list of integer words
@@ -11,7 +14,7 @@ def bytes_to_words(byte_message: bytes, word_size: int = 4) -> list[int]:
     return result
 
 
-def words_to_bytes(words: list, word_size: int = 4) -> bytes:
+def words_to_bytes(words: Sequence[int], word_size: int = 4) -> bytes:
     """
     Transforms list of words into one bytes object
     """

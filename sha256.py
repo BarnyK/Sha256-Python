@@ -33,8 +33,8 @@ def sha256(
     in_hex : controlls if output will be in hex(defualt) or in bytes
     encoding : specifies encoding used for string to bytes conversion
     """
-    message = message.encode(encoding)
-    return sha256_bytes(message, in_hex=in_hex)
+    message_bytes = message.encode(encoding)
+    return sha256_bytes(message_bytes, in_hex=in_hex)
 
 
 def sha256_bytes(message: bytes, in_hex: bool = True) -> Union[str, bytes]:
@@ -71,7 +71,7 @@ def sha256_bytes(message: bytes, in_hex: bool = True) -> Union[str, bytes]:
         )
 
     # initializing hash value and pre-processing
-    hash_values = INITIAL_HASH_VALUES
+    hash_values: tuple[int, ...] = INITIAL_HASH_VALUES
     message = pad_message(message)
     word_list = bytes_to_words(message)
 
@@ -80,7 +80,7 @@ def sha256_bytes(message: bytes, in_hex: bool = True) -> Union[str, bytes]:
     for chunk in chunks:
         # Initializing values for the current loop
         W = chunk[:]
-        working_variables = hash_values
+        working_variables: tuple[int, ...] = hash_values
 
         # Extend chunks onto the whole range
         for i in range(16, 64):
